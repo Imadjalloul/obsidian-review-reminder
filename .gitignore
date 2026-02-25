@@ -1,0 +1,22 @@
+# Build output
+main.js
+
+# Dependencies
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.js.map
+
+# npm
+package-lock.json
+
+# Data file (user settings, not committed)
+data.json

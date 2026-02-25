@@ -1,0 +1,20 @@
+{
+  "name": "review-reminder",
+  "version": "1.0.0",
+  "description": "Obsidian plugin — review reminder dashboard with spaced repetition",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "node esbuild.config.mjs production"
+  },
+  "keywords": [],
+  "author": "Imad Jalloul",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "builtin-modules": "^3.3.0",
+    "esbuild": "^0.19.0",
+    "obsidian": "latest",
+    "typescript": "^5.3.0"
+  }
+}
