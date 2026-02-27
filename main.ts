@@ -122,8 +122,8 @@ export default class ReviewReminderPlugin extends Plugin {
 
         this.registerView(VIEW_TYPE, (leaf) => new ReviewSidebarView(leaf, this));
 
-        this.addRibbonIcon("calendar-clock", "Review Reminder", () => {
-            this.activateView();
+        this.addRibbonIcon("calendar-clock", "Review reminder", () => {
+            void this.activateView();
         });
 
         this.statusBarEl = this.addStatusBarItem();
@@ -131,13 +131,13 @@ export default class ReviewReminderPlugin extends Plugin {
 
         this.addCommand({
             id: "open-review-queue",
-            name: "Open Review Queue",
-            callback: () => this.activateView(),
+            name: "Open review queue",
+            callback: () => void this.activateView(),
         });
 
         this.addCommand({
             id: "refresh-review-queue",
-            name: "Refresh Review Queue",
+            name: "Refresh review queue",
             callback: () => this.refresh(),
         });
 
@@ -153,10 +153,6 @@ export default class ReviewReminderPlugin extends Plugin {
                 this.startupNotice();
             }
         });
-    }
-
-    onunload() {
-        this.app.workspace.detachLeavesOfType(VIEW_TYPE);
     }
 
     /* ── settings ── */
@@ -224,7 +220,7 @@ export default class ReviewReminderPlugin extends Plugin {
 
     /* ── actions ── */
 
-    async refresh() {
+    refresh() {
         this.notes = this.scanVault();
         this.updateStatusBar();
         for (const leaf of this.app.workspace.getLeavesOfType(VIEW_TYPE)) {
@@ -265,7 +261,7 @@ export default class ReviewReminderPlugin extends Plugin {
         }
     }
 
-    async markReviewed(note: ReviewNote) {
+    markReviewed(note: ReviewNote) {
         new ReviewModal(this.app, this, note).open();
     }
 
@@ -297,10 +293,10 @@ class ReviewReminderSettingTab extends PluginSettingTab {
         const { containerEl } = this;
         containerEl.empty();
 
-        containerEl.createEl("h2", { text: "Review Reminder — Settings" });
+        new Setting(containerEl).setName("Review reminder").setHeading();
 
         /* ── Property names ── */
-        containerEl.createEl("h3", { text: "Frontmatter Properties" });
+        new Setting(containerEl).setName("Frontmatter properties").setHeading();
 
         new Setting(containerEl)
             .setName("Date property")
@@ -329,7 +325,7 @@ class ReviewReminderSettingTab extends PluginSettingTab {
             );
 
         /* ── Spaced repetition ── */
-        containerEl.createEl("h3", { text: "Spaced Repetition" });
+        new Setting(containerEl).setName("Spaced repetition").setHeading();
 
         new Setting(containerEl)
             .setName("Intervals (days)")
@@ -360,7 +356,7 @@ class ReviewReminderSettingTab extends PluginSettingTab {
         }
 
         /* ── Display ── */
-        containerEl.createEl("h3", { text: "Display" });
+        new Setting(containerEl).setName("Display").setHeading();
 
         new Setting(containerEl)
             .setName("Upcoming threshold (days)")
@@ -406,14 +402,15 @@ class ReviewSidebarView extends ItemView {
         return VIEW_TYPE;
     }
     getDisplayText(): string {
-        return "Review Reminder";
+        return "Review reminder";
     }
     getIcon(): string {
         return "calendar-clock";
     }
 
-    async onOpen() {
+    onOpen() {
         this.renderView();
+        return Promise.resolve();
     }
 
     renderView() {
@@ -422,7 +419,7 @@ class ReviewSidebarView extends ItemView {
         container.addClass("review-reminder-container");
 
         const header = container.createDiv({ cls: "rr-header" });
-        header.createEl("h4", { text: "📋 Review Queue" });
+        header.createEl("h4", { text: "📋 Review queue" });
 
         const refreshBtn = header.createEl("button", {
             cls: "rr-refresh-btn",
@@ -446,7 +443,7 @@ class ReviewSidebarView extends ItemView {
         const threshold = this.plugin.settings.upcomingDays;
         const sections: { key: Bucket; label: string; emoji: string; cls: string }[] = [
             { key: "overdue", label: "Overdue", emoji: "🔴", cls: "rr-overdue" },
-            { key: "today", label: "Due Today", emoji: "🟠", cls: "rr-today" },
+            { key: "today", label: "Due today", emoji: "🟠", cls: "rr-today" },
             { key: "upcoming", label: `Upcoming (${threshold}d)`, emoji: "🟡", cls: "rr-upcoming" },
             { key: "later", label: "Later", emoji: "🟢", cls: "rr-later" },
         ];
@@ -493,7 +490,7 @@ class ReviewSidebarView extends ItemView {
 
                 card.addEventListener("click", (e) => {
                     if ((e.target as HTMLElement).closest(".rr-review-btn")) return;
-                    this.app.workspace.getLeaf(false).openFile(note.file);
+                    void this.app.workspace.getLeaf(false).openFile(note.file);
                 });
 
                 const btn = row.createEl("button", {
@@ -503,7 +500,7 @@ class ReviewSidebarView extends ItemView {
                 setIcon(btn, "check-circle");
                 btn.addEventListener("click", (e) => {
                     e.stopPropagation();
-                    this.plugin.markReviewed(note);
+                    void this.plugin.markReviewed(note);
                 });
             }
         }
@@ -528,7 +525,7 @@ class ReviewModal extends Modal {
         const { contentEl } = this;
         contentEl.addClass("rr-modal");
 
-        contentEl.createEl("h3", { text: "✅ Mark as Reviewed" });
+        contentEl.createEl("h3", { text: "✅ Mark as reviewed" });
         contentEl.createEl("p", {
             cls: "rr-modal-note-title",
             text: this.note.title,
@@ -573,7 +570,7 @@ class ReviewModal extends Modal {
             btn.addEventListener("click", () => {
                 const customDate = new Date();
                 customDate.setDate(customDate.getDate() + opt.days);
-                this.plugin.applyReview(this.note, customDate, newFreq);
+                void this.plugin.applyReview(this.note, customDate, newFreq);
                 this.close();
             });
         }
@@ -584,7 +581,7 @@ class ReviewModal extends Modal {
             text: `✅ Confirm (${interval} days)`,
         });
         confirmBtn.addEventListener("click", () => {
-            this.plugin.applyReview(this.note, nextDate, newFreq);
+            void this.plugin.applyReview(this.note, nextDate, newFreq);
             this.close();
         });
 
