@@ -251,13 +251,13 @@ export default class ReviewReminderPlugin extends Plugin {
     async activateView() {
         const existing = this.app.workspace.getLeavesOfType(VIEW_TYPE);
         if (existing.length) {
-            this.app.workspace.revealLeaf(existing[0]);
+            void this.app.workspace.revealLeaf(existing[0]);
             return;
         }
         const leaf = this.app.workspace.getRightLeaf(false);
         if (leaf) {
             await leaf.setViewState({ type: VIEW_TYPE, active: true });
-            this.app.workspace.revealLeaf(leaf);
+            void this.app.workspace.revealLeaf(leaf);
         }
     }
 
@@ -293,17 +293,17 @@ class ReviewReminderSettingTab extends PluginSettingTab {
         const { containerEl } = this;
         containerEl.empty();
 
-        new Setting(containerEl).setName("Review reminder").setHeading();
+        new Setting(containerEl).setName("General").setHeading();
 
         /* ── Property names ── */
         new Setting(containerEl).setName("Frontmatter properties").setHeading();
 
         new Setting(containerEl)
             .setName("Date property")
-            .setDesc("The frontmatter property that stores the next review date (YYYY-MM-DD).")
+            .setDesc("Frontmatter property that stores the next review date (YYYY-MM-DD).")
             .addText((text) =>
                 text
-                    .setPlaceholder("review_next")
+                    .setPlaceholder("e.g. review_next")
                     .setValue(this.plugin.settings.dateProperty)
                     .onChange(async (value) => {
                         this.plugin.settings.dateProperty = value.trim() || "review_next";
@@ -313,10 +313,10 @@ class ReviewReminderSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName("Frequency / level property")
-            .setDesc("The frontmatter property that stores the current review level (integer).")
+            .setDesc("Frontmatter property that stores the current review level (integer).")
             .addText((text) =>
                 text
-                    .setPlaceholder("review_freq")
+                    .setPlaceholder("e.g. review_freq")
                     .setValue(this.plugin.settings.freqProperty)
                     .onChange(async (value) => {
                         this.plugin.settings.freqProperty = value.trim() || "review_freq";
@@ -360,7 +360,7 @@ class ReviewReminderSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName("Upcoming threshold (days)")
-            .setDesc("Notes due within this many days appear in the 'Upcoming' section.")
+            .setDesc("Notes due within this many days appear in the 'upcoming' section.")
             .addSlider((slider) =>
                 slider
                     .setLimits(1, 30, 1)
@@ -419,7 +419,7 @@ class ReviewSidebarView extends ItemView {
         container.addClass("review-reminder-container");
 
         const header = container.createDiv({ cls: "rr-header" });
-        header.createEl("h4", { text: "📋 Review queue" });
+        header.createEl("h4", { text: "📋 review queue" });
 
         const refreshBtn = header.createEl("button", {
             cls: "rr-refresh-btn",
@@ -525,7 +525,7 @@ class ReviewModal extends Modal {
         const { contentEl } = this;
         contentEl.addClass("rr-modal");
 
-        contentEl.createEl("h3", { text: "✅ Mark as reviewed" });
+        contentEl.createEl("h3", { text: "✅ mark as reviewed" });
         contentEl.createEl("p", {
             cls: "rr-modal-note-title",
             text: this.note.title,
